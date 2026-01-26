@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: medic-db
+    environment:
+      POSTGRES_DB: medic_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+
+  insurance-mock:
+    build:
+      context: ./insurance-validation-mock-service
+    container_name: insurance-mock
+    ports:
+      - "8081:8081"
+    environment:
+      - SERVER_PORT=8081
+
+  medic-center:
+    build:
+      context: .
+    container_name: medic-center
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - insurance-mock
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/medic_db
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=password
+      - INSURANCE_MOCK_URL=http://insurance-mock:8081/insurance/validate
+      - SPRING_FLYWAY_ENABLED=true
