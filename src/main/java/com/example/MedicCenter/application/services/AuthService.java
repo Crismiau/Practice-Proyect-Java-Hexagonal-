@@ -23,15 +23,21 @@ public class AuthService implements AuthUseCase {
     public AccessToken login(String username, String password) {
         User user = userRepositoryPort.findByUsername(username)
                 .orElseThrow(() -> {
-                    meterRegistry.counter("auth.login.failure", "reason", "user_not_found").increment();
+                    if (meterRegistry != null) {
+                        meterRegistry.counter("auth.login.failure", "reason", "user_not_found").increment();
+                    }
                     return new RuntimeException("User not found");
                 });
 
         if (passwordEncoderPort.matches(password, user.getPassword())) {
-            meterRegistry.counter("auth.login.success").increment();
+            if (meterRegistry != null) {
+                meterRegistry.counter("auth.login.success").increment();
+            }
             return tokenServicePort.generateToken(user);
         } else {
-            meterRegistry.counter("auth.login.failure", "reason", "invalid_password").increment();
+            if (meterRegistry != null) {
+                meterRegistry.counter("auth.login.failure", "reason", "invalid_password").increment();
+            }
             throw new RuntimeException("Invalid credentials");
         }
     }

@@ -16,14 +16,15 @@ public class InsuranceServiceAdapter implements InsuranceServicePort {
 
     private final RestTemplate restTemplate;
 
-    @Value("${insurance.mock.url:http://localhost:8081/insurance/validate}")
+    @Value("${insurance.mock.url:http://localhost:8081/coverage-evaluation}")
     private String mockUrl;
 
     @Override
     public InsuranceAuth validateCoverage(String dni, String procedureType, Double cost) {
         Map<String, Object> request = new HashMap<>();
         request.put("documento", dni);
-        request.put("tipoProcedimiento", procedureType);
+        request.put("tipoAfiliacion", "CONTRIBUTIVO"); // Valor por defecto para el mock
+        request.put("codigoServicio", procedureType);
         request.put("costo", cost);
 
         try {
@@ -34,8 +35,8 @@ public class InsuranceServiceAdapter implements InsuranceServicePort {
             return new InsuranceAuth(
                     response.getDocumento(),
                     response.getPorcentajeCobertura(),
-                    response.getEstadoCobertura(),
-                    response.getCodigoAutorizacion());
+                    response.getNivelCobertura(),
+                    "AUTH-" + System.currentTimeMillis());
         } catch (Exception e) {
             // Simplified error handling
             return new InsuranceAuth(dni, 0, "NO_AUTORIZADO", "ERROR-" + System.currentTimeMillis());
@@ -45,8 +46,8 @@ public class InsuranceServiceAdapter implements InsuranceServicePort {
     private static class InsuranceResponse {
         private String documento;
         private Integer porcentajeCobertura;
-        private String estadoCobertura;
-        private String codigoAutorizacion;
+        private String nivelCobertura;
+        private Boolean requiereCopago;
 
         public String getDocumento() {
             return documento;
@@ -64,20 +65,20 @@ public class InsuranceServiceAdapter implements InsuranceServicePort {
             this.porcentajeCobertura = porcentajeCobertura;
         }
 
-        public String getEstadoCobertura() {
-            return estadoCobertura;
+        public String getNivelCobertura() {
+            return nivelCobertura;
         }
 
-        public void setEstadoCobertura(String estadoCobertura) {
-            this.estadoCobertura = estadoCobertura;
+        public void setNivelCobertura(String nivelCobertura) {
+            this.nivelCobertura = nivelCobertura;
         }
 
-        public String getCodigoAutorizacion() {
-            return codigoAutorizacion;
+        public Boolean getRequiereCopago() {
+            return requiereCopago;
         }
 
-        public void setCodigoAutorizacion(String codigoAutorizacion) {
-            this.codigoAutorizacion = codigoAutorizacion;
+        public void setRequiereCopago(Boolean requiereCopago) {
+            this.requiereCopago = requiereCopago;
         }
     }
 }

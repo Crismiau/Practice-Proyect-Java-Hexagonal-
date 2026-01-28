@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface JpaPatientRepository extends JpaRepository<PatientEntity, Long> {
-    Optional<PatientEntity> findByDni(String dni);
+    Optional<PatientEntity> findByDocumento(String documento);
 
-    boolean existsByDni(String dni);
+    boolean existsByDocumento(String documento);
 }

@@ -5,7 +5,7 @@ CREATE TABLE solicitudes_autorizacion (
     paciente_id BIGINT NOT NULL,
     tipo_servicio VARCHAR(20) NOT NULL CHECK (tipo_servicio IN ('CONSULTA', 'PROCEDIMIENTO', 'CIRUGIA')),
     codigo_servicio VARCHAR(50) NOT NULL,
-    costo_estimado DECIMAL(12, 2) NOT NULL,
+    costo_estimado DOUBLE NOT NULL,
     fecha_solicitud TIMESTAMP NOT NULL,
     estado VARCHAR(20) NOT NULL CHECK (estado IN ('PENDIENTE', 'APROBADA', 'RECHAZADA')),
     evaluacion_cobertura_id BIGINT,

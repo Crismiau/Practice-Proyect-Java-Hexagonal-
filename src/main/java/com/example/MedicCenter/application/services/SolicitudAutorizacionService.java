@@ -59,9 +59,11 @@ public class SolicitudAutorizacionService implements SolicitudAutorizacionUseCas
         solicitud.setEstado("PENDIENTE");
 
         SolicitudAutorizacion saved = solicitudRepository.save(solicitud);
-        log.info("Solicitud registrada con ID: {} en estado PENDIENTE", saved.getId());
+        log.info("Solicitud registrada con ID: {} en estado PENDIENTE. Iniciando evaluación automática...",
+                saved.getId());
 
-        return saved;
+        // Altear el flujo para que sea automático según el requerimiento funcional
+        return evaluarAutorizacion(saved.getId());
     }
 
     @Override
@@ -96,6 +98,17 @@ public class SolicitudAutorizacionService implements SolicitudAutorizacionUseCas
         double porcentajeCopago = (100.0 - validationResponse.getPorcentajeCobertura()) / 100.0;
         boolean cumpleCopago = porcentajeCopago <= COPAGO_MAXIMO_PERMITIDO;
 
+        // Regla adicional: Restricción según tipo de afiliación
+        boolean cumpleRestriccionAfiliacion = true;
+        String motivoRestriccion = "";
+
+        if ("SUBSIDIADO".equals(paciente.getTipoAfiliacion()) && "CIRUGIA".equals(solicitud.getTipoServicio())) {
+            if (solicitud.getCostoEstimado() > 2000000) {
+                cumpleRestriccionAfiliacion = false;
+                motivoRestriccion = "Pacientes SUBSIDIADOS no tienen cobertura para CIRUGIA de alto costo (> 2,000,000)";
+            }
+        }
+
         // 4. Generar EvaluacionCobertura
         EvaluacionCobertura evaluacion = new EvaluacionCobertura();
         evaluacion.setPorcentajeCobertura(validationResponse.getPorcentajeCobertura());
@@ -107,14 +120,16 @@ public class SolicitudAutorizacionService implements SolicitudAutorizacionUseCas
         String nuevoEstado;
         String motivo;
 
-        if (cumpleCobertura && cumpleCopago) {
+        if (cumpleCobertura && cumpleCopago && cumpleRestriccionAfiliacion) {
             nuevoEstado = "APROBADA";
             motivo = String.format("Autorización aprobada. Cobertura: %d%%, Nivel: %s",
                     validationResponse.getPorcentajeCobertura(),
                     validationResponse.getNivelCobertura());
         } else {
             nuevoEstado = "RECHAZADA";
-            if (!cumpleCobertura) {
+            if (!cumpleRestriccionAfiliacion) {
+                motivo = motivoRestriccion;
+            } else if (!cumpleCobertura) {
                 motivo = String.format("Cobertura insuficiente. Requerido: %d%%, Obtenido: %d%%",
                         coberturaMinima, validationResponse.getPorcentajeCobertura());
             } else {

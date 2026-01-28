@@ -24,12 +24,13 @@ public class PatientMapper {
         if (domain == null)
             return null;
 
-        return new PatientEntity(
-                domain.getId(),
-                domain.getDocumento(),
-                domain.getNombreCompleto(),
-                domain.getTipoAfiliacion(),
-                domain.getFechaAfiliacion(),
-                domain.getEstado());
+        PatientEntity entity = new PatientEntity();
+        entity.setId(domain.getId());
+        entity.setDocumento(domain.getDocumento());
+        entity.setNombreCompleto(domain.getNombreCompleto());
+        entity.setTipoAfiliacion(domain.getTipoAfiliacion());
+        entity.setFechaAfiliacion(domain.getFechaAfiliacion());
+        entity.setEstado(domain.getEstado());
+        return entity;
     }
 }

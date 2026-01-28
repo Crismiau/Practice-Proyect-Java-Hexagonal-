@@ -6,8 +6,8 @@
 -- paciente / paciente123
 INSERT INTO users (username, password, role) VALUES
 ('admin', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ROLE_ADMIN'),
-('medico', '$2a$10$DowJonesIA6sPmXdKlXvpe.7Vu8YHhRmJhXJlLqRxXGWJJlNGMXOi', 'ROLE_MEDICO'),
-('paciente', '$2a$10$VcdzH8z.VLsHNDmXLpLHBOxRXPRKXKvLKJLLJLJLJLJLJLJLJLJLJ', 'ROLE_PACIENTE');
+('medico', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ROLE_MEDICO'),
+('paciente', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ROLE_PACIENTE');
 
 -- Pacientes de prueba
 INSERT INTO patients (documento, nombre_completo, tipo_afiliacion, fecha_afiliacion, estado) VALUES
@@ -18,6 +18,6 @@ INSERT INTO patients (documento, nombre_completo, tipo_afiliacion, fecha_afiliac
 
 -- Solicitudes de autorización de ejemplo
 INSERT INTO solicitudes_autorizacion (paciente_id, tipo_servicio, codigo_servicio, costo_estimado, fecha_solicitud, estado) VALUES
-(1, 'CONSULTA', 'CONS-001', 150000, NOW() - INTERVAL '2 days', 'PENDIENTE'),
-(2, 'PROCEDIMIENTO', 'PROC-123', 1200000, NOW() - INTERVAL '1 day', 'PENDIENTE'),
+(1, 'CONSULTA', 'CONS-001', 150000, DATEADD('DAY', -2, NOW()), 'PENDIENTE'),
+(2, 'PROCEDIMIENTO', 'PROC-123', 1200000, DATEADD('DAY', -1, NOW()), 'PENDIENTE'),
 (3, 'CIRUGIA', 'CIRUG-456', 5000000, NOW(), 'PENDIENTE');

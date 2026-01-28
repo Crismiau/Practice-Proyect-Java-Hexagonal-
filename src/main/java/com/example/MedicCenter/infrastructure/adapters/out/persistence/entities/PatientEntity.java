@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDate;
 
@@ -32,4 +33,8 @@ public class PatientEntity {
 
     @Column(nullable = false)
     private String estado; // ACTIVO, INACTIVO
+
+    @OneToMany(mappedBy = "paciente", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private java.util.List<SolicitudAutorizacionEntity> solicitudes = new java.util.ArrayList<>();
 }

@@ -54,14 +54,27 @@ public class GlobalExceptionHandler {
         return addCustomProperties(problemDetail, request);
     }
 
+    @ExceptionHandler(RuntimeException.class)
+    public ProblemDetail handleRuntimeException(RuntimeException ex) {
+        if (ex.getMessage().contains("Invalid credentials") || ex.getMessage().contains("User not found")) {
+            ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                    HttpStatus.UNAUTHORIZED,
+                    ex.getMessage());
+            problemDetail.setTitle("Authentication Failed");
+            return problemDetail;
+        }
+        return handleGeneralException(ex);
+    }
+
     @ExceptionHandler(Exception.class)
-    public ProblemDetail handleGeneralException(Exception ex, WebRequest request) {
-        log.error("Unexpected error occurred", ex);
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,
-                "An unexpected error occurred");
-        problemDetail.setTitle("Internal Server Error");
+    public ProblemDetail handleGeneralException(Exception ex) {
+        log.error("Unexpected error occurred: {}", ex.getMessage(), ex);
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "An unexpected error occurred. Please try again later.");
         problemDetail.setType(URI.create("https://mediccenter.com/errors/internal"));
-        return addCustomProperties(problemDetail, request);
+        problemDetail.setTitle("Internal Server Error");
+        return problemDetail;
     }
 
     private ProblemDetail addCustomProperties(ProblemDetail problemDetail, WebRequest request) {
