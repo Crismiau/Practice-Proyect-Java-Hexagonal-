@@ -18,6 +18,6 @@ INSERT INTO patients (documento, nombre_completo, tipo_afiliacion, fecha_afiliac
 
 -- Solicitudes de autorización de ejemplo
 INSERT INTO solicitudes_autorizacion (paciente_id, tipo_servicio, codigo_servicio, costo_estimado, fecha_solicitud, estado) VALUES
-(1, 'CONSULTA', 'CONS-001', 150000, DATEADD('DAY', -2, NOW()), 'PENDIENTE'),
-(2, 'PROCEDIMIENTO', 'PROC-123', 1200000, DATEADD('DAY', -1, NOW()), 'PENDIENTE'),
-(3, 'CIRUGIA', 'CIRUG-456', 5000000, NOW(), 'PENDIENTE');
+(1, 'CONSULTA', 'CONS-001', 150000, CURRENT_TIMESTAMP - INTERVAL '2 days', 'PENDIENTE'),
+(2, 'PROCEDIMIENTO', 'PROC-123', 1200000, CURRENT_TIMESTAMP - INTERVAL '1 day', 'PENDIENTE'),
+(3, 'CIRUGIA', 'CIRUG-456', 5000000, CURRENT_TIMESTAMP, 'PENDIENTE');
