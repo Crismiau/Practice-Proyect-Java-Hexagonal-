@@ -1,10 +1,12 @@
 # 🏥 MedicCenter - Sistema de Gestión de Citas Médicas
 
-Este proyecto es un backend robusto diseñado para gestionar centros médicos, permitiendo la administración de pacientes, citas y seguridad. Está construido bajo los principios de la **Arquitectura Hexagonal (Puertos y Adaptadores)**, lo que garantiza un código desacoplado, testeable y fácil de mantener.
+Este proyecto es una solución integral para la gestión de centros médicos, permitiendo la administración eficiente de pacientes, citas y seguridad. Diseñado bajo los principios de **Arquitectura Hexagonal (Puertos y Adaptadores)**, garantiza un sistema altamente desacoplado, mantenible y orientado a pruebas.
 
-## 🏗️ Estructura del Proyecto
+---
 
-El proyecto sigue una **Arquitectura Hexagonal (Puertos y Adaptadores)**. Este patrón divide la aplicación en capas concéntricas, donde la dependencia siempre va hacia el centro (el Dominio).
+## 🏗️ Arquitectura del Sistema
+
+El proyecto implementa una **Arquitectura Hexagonal**, organizando la lógica de negocio en el núcleo y dejando los detalles tecnológicos en la periferia.
 
 ```text
        +---------------------------------------------------------+
@@ -15,125 +17,154 @@ El proyecto sigue una **Arquitectura Hexagonal (Puertos y Adaptadores)**. Este p
        |       |           Application Layer             |       |
        |       |          (Services, Use Cases)          |       |
        |       |                                         |       |
-       |       |       +-------------------------+       |       |
-       |       |       |      Domain Layer       |       |       |
-       |       |       |   (Models, Ports, Ex)   |       |       |
-       |       |       +-------------------------+       |       |
+       |       +-------------------------+               |       |
+       |       |      Domain Layer       |               |       |
+       |       |   (Models, Ports, Ex)   |               |       |
+       |       +-------------------------+               |       |
        |       +-----------------------------------------+       |
        +---------------------------------------------------------+
 ```
 
-### 1. 📂 Capa de Dominio (`domain`)
-Es el corazón del sistema, independiente de cualquier tecnología o framework.
-- **Modelos (`model`)**: Representan los objetos de negocio (`Patient`, `Appointment`). No son entidades de JPA, son objetos Java puros (POJOs).
-- **Puertos de Entrada (`ports.in`)**: Interfaces que definen las operaciones permitidas por el dominio (`AppointmentUseCase`).
-- **Puertos de Salida (`ports.out`)**: Interfaces que el dominio define para que la infraestructura las implemente (abstracción de base de datos, servicios externos).
-- **Excepciones (`exception`)**: Define qué errores pueden ocurrir en el negocio.
+### Capas del Proyecto
 
-### 2. 📂 Capa de Aplicación (`application`)
-Coordina la ejecución de la lógica de negocio.
-- **Servicios (`services`)**: Implementan los puertos de entrada. Orquestan el flujo de datos entre los puertos de salida y el dominio. No contienen lógica de bajo nivel (como SQL o HTTP).
-
-### 3. 📂 Capa de Infraestructura (`infrastructure`)
-Contiene los detalles de implementación tecnológica.
-- **Inbound Adapters**: Controladores REST (`AuthController`, `PatientController`) que transforman JSON en llamadas al dominio.
-- **Outbound Adapters**: 
-    - **Persistencia**: Implementa los repositorios usando Spring Data JPA.
-    - **Seguridad**: Implementaciones de JWT y BCrypt.
-    - **External**: Clientes REST para conectarse a otros microservicios.
-- **Configuración (`config`)**: Donde ocurre la magia de Spring; conexión de beans y configuración de filtros de seguridad.
-
+1. **Domain (Núcleo):** Contiene la lógica pura del negocio (POJOs), interfaces de puertos de entrada/salida y excepciones personalizadas. Sin dependencias de frameworks.
+2. **Application:** Implementa los casos de uso definidos en el dominio, orquestando la comunicación entre la infraestructura y el núcleo.
+3. **Infrastructure:** Implementaciones técnicas (Spring Data JPA, JWT, Controladores REST, Clientes para microservicios externos).
 
 ---
 
-## 🚀 Tecnologías Utilizadas
+## 🚀 Stack Tecnológico
 
-- **Java 21**
-- **Spring Boot 3.2.1**
-- **Spring Security & JWT**: Para autenticación y autorización basada en roles.
-- **Spring Data JPA**: Para la persistencia de datos.
-- **Flyway**: Para el control de versiones y migraciones de la base de datos.
-- **PostgreSQL / H2**: Base de datos de producción y de desarrollo/test.
-- **Micrometer & Prometheus**: Para monitoreo y métricas de negocio.
-- **Lombok**: Para reducir el código repetitivo (Boilerplate).
-- **OpenAPI (Swagger)**: Para documentación interactiva de la API.
-
----
-
-## 🛠️ Flujo de Trabajo y Características
-
-### 🔐 Seguridad y Autenticación
-El sistema utiliza **JSON Web Tokens (JWT)** para proteger los endpoints.
-- **Registro y Login**: Gestionados por `AuthService`.
-- **Roles**: Soporta `ROLE_PACIENTE`, `ROLE_MEDICO` y `ROLE_ADMIN`.
-- **Métricas**: Se registran intentos de login exitosos y fallidos mediante `MeterRegistry`.
-
-### 📅 Gestión de Citas (`Appointments`)
-El flujo de creación de una cita incluye validación externa:
-1. El sistema recibe una solicitud de cita.
-2. Se comunica con un servicio externo de seguros (`insurance-validation-mock-service`).
-3. Si el seguro es válido y la cobertura es suficiente, la cita se programa.
-4. Las citas futuras y las validaciones de DNI son reglas de negocio estrictas.
-
-### 👥 Gestión de Pacientes
-- CRUD completo de pacientes con validaciones de unicidad de DNI.
-- Integridad referencial asegurada en la persistencia.
+- **Backend:** Java 21 & Spring Boot 3.2.1
+- **Seguridad:** Spring Security & JWT (JSON Web Tokens)
+- **Base de Datos:** PostgreSQL 15 & H2 (para tests)
+- **Persistencia:** Spring Data JPA & Flyway (Migraciones)
+- **Monitoreo:** Micrometer, Prometheus & Actuator
+- **Documentación:** SpringDoc OpenAPI (Swagger UI)
+- **Containerización:** Docker & Docker Compose
+- **Calidad:** JUnit 5, Mockito & Testcontainers
 
 ---
 
-## ⚙️ Configuración y Ejecución
+## 🛠️ Instalación y Configuración
 
-### 🐳 Opción 1: Docker Compose (Recomendado)
-Esta es la forma más sencilla de levantar todo el ecosistema (Base de datos, Mock de Seguros y el Backend de MedicCenter) con un solo comando.
+### Prerrequisitos
 
-1. Asegúrate de tener **Docker** y **Docker Compose** instalados.
-2. Desde la raíz del proyecto, ejecuta:
+- **Docker** y **Docker Compose** (Altamente recomendado)
+- **JDK 21** (Si deseas ejecutarlo de forma manual)
+- **Maven 3.9+** (Si deseas compilar manualmente)
+
+---
+
+### Opción 1: Ejecución con Docker (Recomendado) 🐳
+
+Este método levanta automáticamente la base de datos, el servicio de seguros y la aplicación principal.
+
+1. Clona el repositorio.
+2. Sitúate en la carpeta del proyecto:
+   ```bash
+   cd MedicCenter
+   ```
+3. Ejecuta el comando:
    ```bash
    docker-compose up --build
    ```
-3. Una vez que los contenedores estén listos, podrás acceder a:
-    - **API MedicCenter**: `http://localhost:8080`
-    - **Swagger UI**: `http://localhost:8080/swagger-ui.html`
-    - **Mock de Seguros**: `http://localhost:8081`
-
-### 💻 Opción 2: Ejecución Local (Manual)
-Si prefieres correrlo localmente sin Docker:
-
-1. **Prerrequisitos**: JDK 21, Maven y una instancia de PostgreSQL (o usar el perfil por defecto con H2).
-2. **Levantar el Mock de Seguros**:
-   ```bash
-   cd insurance-validation-mock-service
-   ./mvnw spring-boot:run
-   ```
-3. **Levantar el Backend Principal**:
-   ```bash
-   # En otra terminal, en la raíz del proyecto
-   ./mvnw spring-boot:run
-   ```
-
-### Documentación de la API
-Una vez iniciada la aplicación, puedes acceder a Swagger UI en:
-`http://localhost:8080/swagger-ui.html`
-
-### Monitoreo
-Endpoints de Actuator disponibles:
-- Métricas: `http://localhost:8080/actuator/metrics`
-- Prometheus: `http://localhost:8080/actuator/prometheus`
+4. **Servicios levantados:**
+   - **App Principal:** [http://localhost:8080](http://localhost:8080)
+   - **Swagger UI:** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+   - **Mock de Seguros:** [http://localhost:8081](http://localhost:8081)
+   - **PostgreSQL:** `localhost:5433` (Credenciales: `user_medic`/`password_medic`)
 
 ---
 
-## 🧪 Pruebas
-El proyecto incluye pruebas unitarias y de integración:
-- **Testcontainers**: Se utilizan contenedores Docker para probar la persistencia con PostgreSQL real durante los tests.
-- **Mockito**: Se utiliza para mockear las dependencias en los tests de servicios.
+### Opción 2: Ejecución Manual (Desarrollo) 💻
 
-Ejecutar tests:
+Si deseas correr los servicios por separado para desarrollo:
+
+#### 1. Iniciar la Base de Datos
+
+Puedes usar Docker solo para la BD:
+
 ```bash
-./mvnw test
+docker run --name mediccenter-db -e POSTGRES_DB=medic_center -e POSTGRES_USER=user_medic -e POSTGRES_PASSWORD=password_medic -p 5433:5432 -d postgres:15-alpine
+```
+
+#### 2. Iniciar el Servicio de Seguros (Mock)
+
+Este servicio es obligatorio para la validación de coberturas.
+
+```bash
+cd insurance-validation-mock-service
+./mvnw spring-boot:run
+```
+
+#### 3. Iniciar la Aplicación Principal
+
+```bash
+cd ..
+./mvnw spring-boot:run
 ```
 
 ---
 
-## 📦 Microservicios Relacionados
-Este sistema interactúa con:
-- **Insurance Validation Mock**: Un servicio mock para simular la validación de seguros médicos. Debe estar corriendo para que la programación de citas funcione correctamente.
+## 🧪 Pruebas y Monitoreo
+
+### Ejecución de Tests
+
+El proyecto utiliza **Testcontainers** para levantar un PostgreSQL real durante los tests de integración.
+
+```bash
+./mvnw test
+```
+
+### Monitoreo y Métricas
+
+Accede a los endpoints de Actuator para observar el estado del sistema:
+
+- **Salud:** [http://localhost:8080/actuator/health](http://localhost:8080/actuator/health)
+- **Métricas:** [http://localhost:8080/actuator/metrics](http://localhost:8080/actuator/metrics)
+- **Prometheus:** [http://localhost:8080/actuator/prometheus](http://localhost:8080/actuator/prometheus)
+
+---
+
+## 🔐 Seguridad y Roles
+
+El acceso a la API está protegido mediante JWT. Debes obtener un token en `/auth/login` o `/auth/register`.
+
+**Roles soportados:**
+
+- `ROLE_PACIENTE`: Usuarios finales del sistema.
+- `ROLE_MEDICO`: Personal médico.
+- `ROLE_ADMIN`: Administración total del sistema.
+
+**Credenciales de prueba (Post-migración):**
+
+| Usuario | Contraseña | Rol |
+| :--- | :--- | :--- |
+| `admin` | `admin123` | `ROLE_ADMIN` |
+| `medico` | `medico123` | `ROLE_MEDICO` |
+| `paciente` | `paciente123` | `ROLE_PACIENTE` |
+
+---
+
+## 📮 API & Documentación
+
+### Postman
+
+En la raíz del proyecto encontrarás el archivo `MedicCenter.postman_collection.json`.
+
+1. Abre Postman.
+2. Haz clic en **Import**.
+3. Selecciona el archivo mencionado para cargar todos los endpoints, ambientes y ejemplos de peticiones pre-configurados.
+
+### Swagger
+
+Accede a la documentación interactiva en:
+[http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+
+---
+
+## 📦 Microservicios
+
+- **MedicCenter:** API Core para gestión de citas y pacientes.
+- **Insurance Validation Mock:** Simula la validación de seguros externos para determinar la cobertura del paciente antes de agendar una cita.
