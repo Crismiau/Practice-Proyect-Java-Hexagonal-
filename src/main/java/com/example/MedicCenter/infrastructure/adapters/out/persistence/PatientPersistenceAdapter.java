@@ -3,41 +3,50 @@ package com.example.MedicCenter.infrastructure.adapters.out.persistence;
 import com.example.MedicCenter.domain.model.Patient;
 import com.example.MedicCenter.domain.ports.out.PatientRepositoryPort;
 import com.example.MedicCenter.infrastructure.adapters.out.persistence.entities.PatientEntity;
-import com.example.MedicCenter.infrastructure.adapters.out.persistence.repositories.JpaPatientRepository;
+import com.example.MedicCenter.infrastructure.adapters.out.persistence.mappers.PatientMapper;
+import com.example.MedicCenter.infrastructure.adapters.out.persistence.repositories.PatientJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class PatientPersistenceAdapter implements PatientRepositoryPort {
 
-    private final JpaPatientRepository repository;
+    private final PatientJpaRepository jpaRepository;
+    private final PatientMapper mapper;
 
     @Override
     public Patient save(Patient patient) {
-        PatientEntity entity = PatientEntity.fromDomain(patient);
-        return repository.save(entity).toDomain();
+        PatientEntity entity = mapper.toEntity(patient);
+        PatientEntity saved = jpaRepository.save(entity);
+        return mapper.toDomain(saved);
     }
 
     @Override
     public Optional<Patient> findById(Long id) {
-        return repository.findById(id).map(PatientEntity::toDomain);
+        return jpaRepository.findById(id)
+                .map(mapper::toDomain);
     }
 
     @Override
-    public Optional<Patient> findByDni(String dni) {
-        return repository.findByDni(dni).map(PatientEntity::toDomain);
+    public List<Patient> findAll() {
+        return jpaRepository.findAll().stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public boolean existsByDni(String dni) {
-        return repository.existsByDni(dni);
+    public Optional<Patient> findByDocumento(String documento) {
+        return jpaRepository.findByDocumento(documento)
+                .map(mapper::toDomain);
     }
 
     @Override
-    public boolean existsById(Long id) {
-        return repository.existsById(id);
+    public void deleteById(Long id) {
+        jpaRepository.deleteById(id);
     }
 }

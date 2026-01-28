@@ -15,22 +15,41 @@ public class InsuranceMockApplication {
         SpringApplication.run(InsuranceMockApplication.class, args);
     }
 
-    @PostMapping("/insurance/validate")
-    public Map<String, Object> validate(@RequestBody Map<String, Object> request) {
+    @PostMapping("/coverage-evaluation")
+    public Map<String, Object> evaluateCoverage(@RequestBody Map<String, Object> request) {
         String documento = (String) request.get("documento");
+        String tipoAfiliacion = (String) request.get("tipoAfiliacion");
+        String codigoServicio = (String) request.get("codigoServicio");
+        Number costo = (Number) request.get("costo");
 
-        // Convertir documento en seed numérico determinista
-        long seed = documento.hashCode();
-        int coverage = (int) (Math.abs(seed) % 101);
+        // Convertir documento en seed numérico determinista (hash mod 1000)
+        long seed = Math.abs(documento.hashCode() % 1000);
 
-        String estado = (coverage > 30) ? "AUTORIZADO" : "NO_AUTORIZADO";
-        String authCode = "AUTH-2024-" + Math.abs(seed % 100000);
+        // Generar porcentaje de cobertura entre 50 y 100
+        int porcentajeCobertura = 50 + (int) (seed % 51);
+
+        // Clasificar nivel de cobertura
+        String nivelCobertura;
+        if (porcentajeCobertura >= 90) {
+            nivelCobertura = "ALTA";
+        } else if (porcentajeCobertura >= 70) {
+            nivelCobertura = "MEDIA";
+        } else {
+            nivelCobertura = "BAJA";
+        }
+
+        // Determinar si requiere copago
+        boolean requiereCopago = porcentajeCobertura < 100;
+
+        // Generar detalle
+        String detalle = "Cobertura parcial según plan del paciente.";
 
         Map<String, Object> response = new HashMap<>();
         response.put("documento", documento);
-        response.put("porcentajeCobertura", coverage);
-        response.put("estadoCobertura", estado);
-        response.put("codigoAutorizacion", authCode);
+        response.put("porcentajeCobertura", porcentajeCobertura);
+        response.put("nivelCobertura", nivelCobertura);
+        response.put("requiereCopago", requiereCopago);
+        response.put("detalle", detalle);
 
         return response;
     }

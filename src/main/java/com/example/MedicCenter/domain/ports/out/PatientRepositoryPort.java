@@ -1,16 +1,19 @@
 package com.example.MedicCenter.domain.ports.out;
 
 import com.example.MedicCenter.domain.model.Patient;
+
+import java.util.List;
 import java.util.Optional;
 
 public interface PatientRepositoryPort {
+
     Patient save(Patient patient);
 
     Optional<Patient> findById(Long id);
 
-    Optional<Patient> findByDni(String dni);
+    Optional<Patient> findByDocumento(String documento);
 
-    boolean existsByDni(String dni);
+    List<Patient> findAll();
 
-    boolean existsById(Long id);
+    void deleteById(Long id);
 }

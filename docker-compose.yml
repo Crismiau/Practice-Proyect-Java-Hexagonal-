@@ -31,5 +31,6 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/medic_db
       - SPRING_DATASOURCE_USERNAME=user
       - SPRING_DATASOURCE_PASSWORD=password
-      - INSURANCE_MOCK_URL=http://insurance-mock:8081/insurance/validate
+      - INSURANCE_VALIDATION_URL=http://insurance-mock:8081/coverage-evaluation
       - SPRING_FLYWAY_ENABLED=true
+

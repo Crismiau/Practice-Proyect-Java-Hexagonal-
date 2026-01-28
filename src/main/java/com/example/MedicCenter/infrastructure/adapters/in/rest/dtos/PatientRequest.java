@@ -2,33 +2,30 @@ package com.example.MedicCenter.infrastructure.adapters.in.rest.dtos;
 
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class PatientRequest {
 
-    @NotBlank(message = "DNI is mandatory")
-    @Size(min = 5, max = 20, message = "DNI must be between 5 and 20 characters")
-    private String dni;
+    @NotBlank(message = "El documento es obligatorio")
+    private String documento;
 
-    @NotBlank(message = "Name is mandatory")
-    private String name;
+    @NotBlank(message = "El nombre completo es obligatorio")
+    private String nombreCompleto;
 
-    @Min(value = 0, message = "Age cannot be negative")
-    private Integer age;
+    @NotBlank(message = "El tipo de afiliación es obligatorio")
+    @Pattern(regexp = "CONTRIBUTIVO|SUBSIDIADO|PARTICULAR", message = "El tipo de afiliación debe ser: CONTRIBUTIVO, SUBSIDIADO o PARTICULAR")
+    private String tipoAfiliacion;
 
-    @NotBlank(message = "Phone is mandatory")
-    private String phone;
+    @NotNull(message = "La fecha de afiliación es obligatoria")
+    @PastOrPresent(message = "La fecha de afiliación no puede ser futura")
+    private LocalDate fechaAfiliacion;
 
-    @Email(message = "Email should be valid")
-    private String email;
-
-    @NotBlank(message = "Status is mandatory")
-    @Pattern(regexp = "ACTIVO|INACTIVO", message = "Status must be ACTIVO or INACTIVO")
-    private String status;
+    @Pattern(regexp = "ACTIVO|INACTIVO", message = "El estado debe ser: ACTIVO o INACTIVO")
+    private String estado;
 }

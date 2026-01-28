@@ -5,31 +5,29 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-
 @Entity
-@Table(name = "patients")
+@Table(name = "evaluaciones_cobertura")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PatientEntity {
+public class EvaluacionCoberturaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String documento;
+    @Column(nullable = false)
+    private Integer porcentajeCobertura;
 
     @Column(nullable = false)
-    private String nombreCompleto;
+    private String nivelCobertura; // BAJA, MEDIA, ALTA
 
     @Column(nullable = false)
-    private String tipoAfiliacion; // CONTRIBUTIVO, SUBSIDIADO, PARTICULAR
+    private Boolean requiereCopago;
 
-    @Column(nullable = false)
-    private LocalDate fechaAfiliacion;
+    @Column(length = 500)
+    private String motivo;
 
-    @Column(nullable = false)
-    private String estado; // ACTIVO, INACTIVO
+    @Column(length = 500)
+    private String detalle;
 }

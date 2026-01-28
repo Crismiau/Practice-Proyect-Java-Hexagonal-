@@ -1,25 +1,26 @@
 package com.example.MedicCenter.domain.model;
 
+import java.time.LocalDate;
+
 public class Patient {
     private Long id;
-    private String dni;
-    private String name;
-    private Integer age;
-    private String phone;
-    private String email;
-    private String status; // ACTIVO, INACTIVO
+    private String documento;
+    private String nombreCompleto;
+    private String tipoAfiliacion; // CONTRIBUTIVO, SUBSIDIADO, PARTICULAR
+    private LocalDate fechaAfiliacion;
+    private String estado; // ACTIVO, INACTIVO
 
     public Patient() {
     }
 
-    public Patient(Long id, String dni, String name, Integer age, String phone, String email, String status) {
+    public Patient(Long id, String documento, String nombreCompleto, String tipoAfiliacion,
+            LocalDate fechaAfiliacion, String estado) {
         this.id = id;
-        this.dni = dni;
-        this.name = name;
-        this.age = age;
-        this.phone = phone;
-        this.email = email;
-        this.status = status;
+        this.documento = documento;
+        this.nombreCompleto = nombreCompleto;
+        this.tipoAfiliacion = tipoAfiliacion;
+        this.fechaAfiliacion = fechaAfiliacion;
+        this.estado = estado;
     }
 
     public Long getId() {
@@ -30,51 +31,43 @@ public class Patient {
         this.id = id;
     }
 
-    public String getDni() {
-        return dni;
+    public String getDocumento() {
+        return documento;
     }
 
-    public void setDni(String dni) {
-        this.dni = dni;
+    public void setDocumento(String documento) {
+        this.documento = documento;
     }
 
-    public String getName() {
-        return name;
+    public String getNombreCompleto() {
+        return nombreCompleto;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNombreCompleto(String nombreCompleto) {
+        this.nombreCompleto = nombreCompleto;
     }
 
-    public Integer getAge() {
-        return age;
+    public String getTipoAfiliacion() {
+        return tipoAfiliacion;
     }
 
-    public void setAge(Integer age) {
-        this.age = age;
+    public void setTipoAfiliacion(String tipoAfiliacion) {
+        this.tipoAfiliacion = tipoAfiliacion;
     }
 
-    public String getPhone() {
-        return phone;
+    public LocalDate getFechaAfiliacion() {
+        return fechaAfiliacion;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setFechaAfiliacion(LocalDate fechaAfiliacion) {
+        this.fechaAfiliacion = fechaAfiliacion;
     }
 
-    public String getEmail() {
-        return email;
+    public String getEstado() {
+        return estado;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 }
